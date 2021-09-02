@@ -6,7 +6,7 @@ import { firebaseConfig } from './firebase';
 
 export default function App() {
 
-  if(!Firebase.apps.length){
+  if (!Firebase.apps.length) {
     Firebase.initializeApp(firebaseConfig)
   }
 
@@ -54,7 +54,7 @@ export default function App() {
       xhr.send(null);
     });
 
-    const ref = Firebase.storage().ref().child(new Date().toISOString())
+    const ref = Firebase.storage().ref().child(new Date().toISOString() + '.jpg')
     const snapshot = ref.put(blob);
 
     snapshot.on(
@@ -71,7 +71,7 @@ export default function App() {
       () => {
         snapshot.snapshot.ref.getDownloadURL().then((url) => {
           setUploading(false)
-          console.log("download url: ", url);
+          console.log("download url: ", `${url}.jpg`);
           // blob.close()
           return url
         })
@@ -82,9 +82,11 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Image source={{ uri: image }} style={{ width: 300, height: 300 }} />
-      <Button title="choose picture" onPress={pickImage} />
-      {!uploading ? <Button title="upload" onPress={uploadImage} /> : <ActivityIndicator size="large" color="#000" />}
+      <View >
+        <Image source={{ uri: image }} style={{ width: 600, height: 300 }} />
+        <Button title="ESCOLHA A IMAGEM" onPress={pickImage} />
+        {!uploading ? <Button title="upload" onPress={uploadImage} /> : <ActivityIndicator size="large" color="#000" />}
+      </View>
     </View>
   );
 }
@@ -92,8 +94,11 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     // flex: 1,
-    backgroundColor: '#fff',
+    width: 300,
+    // backgroundColor: 'grey',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'center'
   },
 });
