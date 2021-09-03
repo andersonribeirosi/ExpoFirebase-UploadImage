@@ -1,24 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Image, Button, Platform, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Image, Button, Platform, ActivityIndicator, SafeAreaView } from 'react-native';
 import Firebase from 'firebase'
 import * as ImagePicker from 'expo-image-picker'
 import { firebaseConfig } from './firebase';
 
+if (!Firebase.apps.length) {
+  Firebase.initializeApp(firebaseConfig)
+}
+
 export default function App() {
-
-  if (!Firebase.apps.length) {
-    Firebase.initializeApp(firebaseConfig)
-  }
-
   const [image, setImage] = useState("")
   const [uploading, setUploading] = useState(false)
+  const [urlUpload, setUrlUpload] = useState("")
 
   useEffect(() => {
     (async () => {
       if (Platform.OS !== 'web') {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
-          alert('Desculpe, sem permissão para a câmera')
+          alert('Desculpe, sem permissão para a acesso da galeria')
         }
       }
     })()
@@ -55,6 +55,7 @@ export default function App() {
     });
 
     const ref = Firebase.storage().ref().child(new Date().toISOString() + '.jpg')
+    // const ref = Firebase.storage().ref().child("banner2" + '.jpg')
     const snapshot = ref.put(blob);
 
     snapshot.on(
@@ -65,40 +66,39 @@ export default function App() {
       (error) => {
         setUploading(false)
         console.log(error);
-        // blob.close();
         return
       },
       () => {
         snapshot.snapshot.ref.getDownloadURL().then((url) => {
           setUploading(false)
+          setUrlUpload(url)
           console.log("download url: ", `${url}.jpg`);
-          // blob.close()
           return url
         })
       }
     )
   }
 
-
   return (
-    <View style={styles.container}>
-      <View >
-        <Image source={{ uri: image }} style={{ width: 600, height: 300 }} />
+    <SafeAreaView style={styles.container}>
+
+      {image && (<Image source={{ uri: image }} style={{ width: 1200, height: 300 }} />)}
+      <View style={{ marginTop: 20, }}>
         <Button title="ESCOLHA A IMAGEM" onPress={pickImage} />
-        {!uploading ? <Button title="upload" onPress={uploadImage} /> : <ActivityIndicator size="large" color="#000" />}
       </View>
-    </View>
+      {!uploading ? <>
+        <View style={{ marginTop: 10 }}>
+          <Button title="upload" onPress={uploadImage} />
+        </View> </> : <ActivityIndicator style={{ marginTop: 10 }} size="large" color="#000" />}
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    width: 300,
-    // backgroundColor: 'grey',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    alignSelf: 'center'
+    flex: 1,
+    width: 1200,
+    marginHorizontal: 16,
+    alignSelf: 'center',
   },
 });
