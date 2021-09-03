@@ -4,8 +4,7 @@ import Firebase from 'firebase'
 import * as ImagePicker from 'expo-image-picker'
 import { firebaseConfig } from './firebase';
 import styles from './style/style'
-
-
+import Feather from 'react-native-vector-icons/Feather'
 
 if (!Firebase.apps.length) {
   Firebase.initializeApp(firebaseConfig)
@@ -15,12 +14,14 @@ const firebaseDb = Firebase.firestore()
 
 export default function App() {
   const [image, setImage] = useState("")
-  const [uploading, setUploading] = useState(false)
-  const [urlUpload, setUrlUpload] = useState("")
-  const [imageList, setImageList] = useState([])
+  const [uploadUrl, setUploadUrl] = useState("")
+  const [uploadImageTmp, setUploadImageTmp] = useState([])
+  const [dataList, setDataList] = useState([])
+  const [showProgress, setShowProgress] = useState(false)
 
   useEffect(() => {
     (async () => {
+
       if (Platform.OS !== 'web') {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
@@ -30,14 +31,18 @@ export default function App() {
     })()
   }, [])
 
+  useEffect(() => {
+    listImages()
+  }, []);
+
   const listImages = () => {
     firebaseDb.collection('Images').onSnapshot(query => {
       const list = [];
       query.forEach(doc => {
         list.push({ ...doc.data(), id: doc.id });
       });
-      setImageList(list);
-      console.log('Lista:', imageList);
+      setDataList(list);
+      console.log('Lista:', dataList);
     });
   }
 
@@ -65,49 +70,52 @@ export default function App() {
       xhr.onload = function () {
         resolve(xhr.response);
       };
-
       xhr.onerror = function () {
         reject(new TypeError('Network request failed'));
       };
-
       xhr.responseType = 'blob';
       xhr.open('GET', image, true);
       xhr.send(null);
     });
 
     // const ref = Firebase.storage().ref().child(new Date().toISOString() + '.jpg')
-    const ref = Firebase.storage().ref().child("banner4" + '.jpg')
+    const ref = Firebase.storage().ref().child("banner5" + '.jpg')
     const snapshot = ref.put(blob);
 
     snapshot.on(
       Firebase.storage.TaskEvent.STATE_CHANGED,
       () => {
-        setUploading(true)
+        setShowProgress(true)
       },
       (error) => {
-        setUploading(false)
+        setShowProgress(false)
         console.log(error);
         return
       },
       () => {
         snapshot.snapshot.ref.getDownloadURL().then((url) => {
-          setUploading(false)
-          setUrlUpload(url)
+          setShowProgress(false)
+          setUploadUrl(url)
+          uploadImageTmp.push(url)
 
-          let imageFilter = imageList?.filter(s => s.domain === "mixbet.com.br")[0]
+          let imageFilter = dataList?.filter(s => s.domain === "mixbet.com.br")[0]
           if (!imageFilter)
             firebaseDb.collection('Images').add({
-              domain: "mixbets.com.br",
+              domain: "mixbet.com.br",
               link: url
+              // link: uploadImageTmp
             })
           else {
             firebaseDb.collection('Images').doc(imageFilter.id).update({
-              domain: "mixbets.com.br",
+              domain: "mixbet.com.br",
+              link: uploadImageTmp
             });
           }
 
           console.log("download url: ", `${url}.jpg`);
+
           return url
+          // return uploadImageTmp
         })
       }
     )
@@ -115,18 +123,18 @@ export default function App() {
 
   return (
     <SafeAreaView style={stylesContainer.container}>
-      <View>{urlUpload || image ? (<Image source={{ uri: urlUpload || image }} style={{ height: 300 }} />) : <></>}</View>
+      <View>{uploadUrl || image ? (<Image source={{ uri: uploadUrl || image }} style={{ height: 300 }} />) : <></>}</View>
       <View style={{ marginTop: 20, }}>
         <Button title="Selecione a imagem" onPress={pickImage} />
       </View>
-      {!uploading ? <Button title="upload" onPress={uploadImage} /> :
+      {!showProgress ? <Button title="upload" onPress={uploadImage} /> :
         <ActivityIndicator style={{ marginTop: 10 }} size="large" color="#000" />}
-      <Button title="Listar Imagens" onPress={listImages}></Button>
+      {/* <Button title="Listar Imagens" onPress={listImages}></Button> */}
 
       <View>
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={imageList}
+          data={dataList}
           renderItem={({ item }) => {
             return (
               <View style={styles.Tasks}>
@@ -135,11 +143,10 @@ export default function App() {
                   onPress={() => {
                     deleteImage(item.id);
                   }}>
-                  {/* <Icon
-                  name="trash"
-                  size={23}
-                  color="grey"></Icon> */}
-                  <Text> Excluir</Text>
+                  <Feather
+                    name="trash"
+                    size={23}
+                    color="grey"></Feather>
                 </TouchableOpacity>
                 <Text
                   style={styles.DescriptionTask}
