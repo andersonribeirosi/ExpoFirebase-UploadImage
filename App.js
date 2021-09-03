@@ -4,10 +4,7 @@ import Firebase from 'firebase'
 import * as ImagePicker from 'expo-image-picker'
 import { firebaseConfig } from './firebase';
 import styles from './style/style'
-
 import Icon from 'react-native-vector-icons/FontAwesome'
-
-
 
 if (!Firebase.apps.length) {
   Firebase.initializeApp(firebaseConfig)
