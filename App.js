@@ -54,8 +54,8 @@ export default function App() {
       xhr.send(null);
     });
 
-    const ref = Firebase.storage().ref().child(new Date().toISOString() + '.jpg')
-    // const ref = Firebase.storage().ref().child("banner2" + '.jpg')
+    // const ref = Firebase.storage().ref().child(new Date().toISOString() + '.jpg')
+    const ref = Firebase.storage().ref().child("banner2" + '.jpg')
     const snapshot = ref.put(blob);
 
     snapshot.on(
@@ -82,14 +82,14 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
 
-      {image && (<Image source={{ uri: image }} style={{ width: 1200, height: 300 }} />)}
+      <View>{image && (<Image source={{ uri: urlUpload || image }} style={{ width: 1200, height: 300 }} />)}</View>
       <View style={{ marginTop: 20, }}>
         <Button title="ESCOLHA A IMAGEM" onPress={pickImage} />
       </View>
       {!uploading ? <>
         <View style={{ marginTop: 10 }}>
           <Button title="upload" onPress={uploadImage} />
-        </View> </> : <ActivityIndicator style={{ marginTop: 10 }} size="large" color="#000" />}
+        </View> </> : <View><ActivityIndicator style={{ marginTop: 10 }} size="large" color="#000" /></View>}
     </SafeAreaView>
   );
 }
