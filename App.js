@@ -39,7 +39,7 @@ export default function App() {
         list.push({ ...doc.data(), id: doc.id });
       });
       setImageList(list);
-      console.log('Lista:', imageList);
+      console.log('Lista:', list);
     });
   }, [])
 
@@ -117,14 +117,13 @@ export default function App() {
 
   return (
     <SafeAreaView style={stylesContainer.container}>
-      <View>{urlUpload || image ? (<Image source={{ uri: urlUpload || image }} style={{ height: 300 }} />) : <></>}</View>
+      <View>{urlUpload || image ? (<Image source={{ uri: urlUpload || image  }} style={{ height: 300 }} />) : <></>}</View>
       <View style={{ marginTop: 20, }}>
         <Button title="Selecione a imagem" onPress={pickImage} />
       </View>
       {!uploading ? <Button title="upload" onPress={uploadImage} /> :
         <ActivityIndicator style={{ marginTop: 10 }} size="large" color="#000" />}
       {/* <Button title="Listar Imagens" onPress={listImages}></Button> */}
-
       <View>
         <FlatList
           showsVerticalScrollIndicator={false}
