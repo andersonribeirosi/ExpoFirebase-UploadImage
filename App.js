@@ -120,7 +120,6 @@ export default function App() {
       </View>
       {!uploading ? <Button title="upload" onPress={uploadImage} /> :
         <ActivityIndicator style={{ marginTop: 10 }} size="large" color="#000" />}
-      {/* <Button title="Listar Imagens" onPress={listImages}></Button> */}
       <View>
         <FlatList
           showsVerticalScrollIndicator={false}
