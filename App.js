@@ -5,6 +5,8 @@ import * as ImagePicker from 'expo-image-picker'
 import { firebaseConfig } from './firebase';
 import styles from './style/style'
 
+import Icon from 'react-native-vector-icons/FontAwesome'
+
 
 
 if (!Firebase.apps.length) {
@@ -30,7 +32,7 @@ export default function App() {
     })()
   }, [])
 
-  const listImages = () => {
+  useEffect(() => {
     firebaseDb.collection('Images').onSnapshot(query => {
       const list = [];
       query.forEach(doc => {
@@ -39,7 +41,7 @@ export default function App() {
       setImageList(list);
       console.log('Lista:', imageList);
     });
-  }
+  }, [])
 
   const deleteImage = (id) => {
     firebaseDb.collection('Images').doc(id).delete();
@@ -121,7 +123,7 @@ export default function App() {
       </View>
       {!uploading ? <Button title="upload" onPress={uploadImage} /> :
         <ActivityIndicator style={{ marginTop: 10 }} size="large" color="#000" />}
-      <Button title="Listar Imagens" onPress={listImages}></Button>
+      {/* <Button title="Listar Imagens" onPress={listImages}></Button> */}
 
       <View>
         <FlatList
@@ -135,20 +137,12 @@ export default function App() {
                   onPress={() => {
                     deleteImage(item.id);
                   }}>
-                  {/* <Icon
-                  name="trash"
-                  size={23}
-                  color="grey"></Icon> */}
-                  <Text> Excluir</Text>
+                  <Icon
+                    name="trash"
+                    size={23}
+                    color="grey"></Icon>
                 </TouchableOpacity>
-                <Text
-                  style={styles.DescriptionTask}
-                  onPress={() =>
-                    navigation.navigate('settings-detail', {
-                      id: item.id,
-                      description: item.description,
-                    })
-                  }>
+                <Text style={styles.DescriptionTask}>
                   {item.link}
                 </Text>
               </View>
