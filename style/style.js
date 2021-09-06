@@ -6,17 +6,17 @@ const styles = StyleSheet.create({
     backgroundColor:"#fff",
     paddingTop: 20
  },
- Tasks:{
+ images:{
   width:"100%",
   flexDirection:"row",
   justifyContent:"space-between",
   marginTop:5
  },
- deleteTask:{
+ deleteRefImage:{
    justifyContent:"center",
    paddingLeft:15,
  },
- DescriptionTask:{
+ descriptionImage:{
   width:"75%",
   alignContent:"flex-start",
   backgroundColor:"#f5f5f5cf",
@@ -26,17 +26,6 @@ const styles = StyleSheet.create({
   marginBottom: 5,
   marginRight:15,
   color:"#282b2db5",
- },
- buttonNewTask:{
-  width:60,
-  height:60,
-  position:"absolute",
-  bottom: 30,
-  left:20,
-  backgroundColor: "grey",
-  borderRadius:50,
-  justifyContent:"center",
-  alignItems: "center"
  },
  iconButton:{
   color:"#ffffff",

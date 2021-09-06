@@ -40,8 +40,20 @@ export default function App() {
     });
   }, [])
 
-  const deleteImage = (id) => {
+  const deleteRefImageFirestore = (id) => {
     firebaseDb.collection('Images').doc(id).delete();
+  }
+
+  const deleteImgStorage = () => {
+    const ref = Firebase.storage().ref('banner5.jpg');
+
+    ref.delete()
+      .then(() => {
+        alert('Imagem excluída com sucesso')
+      })
+      .catch((deleteError) => {
+        alert(deleteError)
+      });
   }
 
   const pickImage = async () => {
@@ -112,32 +124,58 @@ export default function App() {
     )
   }
 
+  const downloadUrl = () => {
+    const ref = Firebase.storage().ref('banner3.jpg');
+
+    ref.getDownloadURL()
+      .then((url) => {
+        console.log(url);
+      });
+  }
+
   return (
     <SafeAreaView style={stylesContainer.container}>
-      <View>{urlUpload || image ? (<Image source={{ uri: urlUpload || image  }} style={{ height: 300 }} />) : <></>}</View>
+      <View>{urlUpload || image ? (<Image source={{ uri: urlUpload || image }} style={{ height: 300 }} />) : <></>}</View>
+
       <View style={{ marginTop: 20, }}>
         <Button title="Selecione a imagem" onPress={pickImage} />
       </View>
-      {!uploading ? <Button title="upload" onPress={uploadImage} /> :
-        <ActivityIndicator style={{ marginTop: 10 }} size="large" color="#000" />}
-      <View>
+
+      <View style={{ marginTop: 20 }}>
+        {!uploading ? <Button title="upload" onPress={uploadImage} /> :
+          <ActivityIndicator style={{ marginTop: 10 }} size="large" color="#000" />}
+      </View>
+
+      <View style={{ marginTop: 20, }}>
+        <Button color={'orange'} title="Deletar imagem" onPress={deleteImgStorage} />
+      </View>
+
+      <View style={{ marginTop: 20, }}>
+        <Button color={'green'} title="Download url" onPress={downloadUrl} />
+      </View >
+
+      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ marginTop: 40, color: 'black', fontSize: 20, fontWeight: 'bold' }}> Lista de imagens (referências) - Firestore-Storage</Text>
+      </View>
+
+      <View style={{ marginTop: 40 }}>
         <FlatList
           showsVerticalScrollIndicator={false}
           data={imageList}
           renderItem={({ item }) => {
             return (
-              <View style={styles.Tasks}>
+              <View style={styles.images}>
                 <TouchableOpacity
-                  style={styles.deleteTask}
+                  style={styles.deleteRefImage}
                   onPress={() => {
-                    deleteImage(item.id);
+                    deleteRefImageFirestore(item.id);
                   }}>
                   <Icon
                     name="trash"
                     size={23}
                     color="grey"></Icon>
                 </TouchableOpacity>
-                <Text style={styles.DescriptionTask}>
+                <Text style={styles.descriptionImage}>
                   {item.link}
                 </Text>
               </View>
